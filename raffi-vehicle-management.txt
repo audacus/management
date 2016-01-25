@@ -1,0 +1,47 @@
+thing
+	id
+	name (VehiclesMil, VehiclesPriv, state, numberplate, type, driver, etc)
+
+thing_fields
+	id
+	thing -> thing.id
+	thing_type -> thing_type.id
+
+thing_type
+	id
+	name (vehicle, date, dropdown, number, double/float, checkbox, etc)
+
+/* properties */
+
+
+state
+	id
+	name (Solothurn, Graubünden, Aargau, etc)
+	short (SO, GR, AG, etc)
+
+numberplate
+	id
+	switch [true, false]
+	number (11234, 12, 42)
+	sate -> state.id
+
+
+
+type
+	id
+	name (Privat, Militär, etc)
+	short (priv, mil, etc)
+
+driver
+	id
+	name
+	vorname
+
+typ_felder
+	id
+	name
+	feld_typ
+
+feld_typ
+	id
+	name (date, dropdown, number, double/float, checkbox, 
