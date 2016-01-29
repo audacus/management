@@ -28,7 +28,7 @@ public class SQLiteJDBC {
 	public SQLiteJDBC(String databaseName, File databasePath) {
 		path = databasePath; 
 		name = databaseName;
-		init();
+		init(path, name);
 	}
 	
 	public Connection init() {
