@@ -1,15 +1,60 @@
 package ch.audacus.management;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
+import ch.audacus.management.table.*;
+
 public class Main {
 
 	public static void main(final String[] args) {
-		System.out.println(Database.getFile().getPath());
+		try {
+			Thing thing = new Thing();
+			Property property = new Property();
+			Management management = new Management();
+			ResultSet properties = property.getAll();
+			ResultSet things = thing.getAll();
+			ResultSet managements = management.getAll();
+			
+			// work
+			Controller controller = new Controller();
+			
+			ResultSet inserted = controller.createManagement("vehicles");
+			while (inserted.next()) {
+				System.out.println("here");
+			}
+			
+			
+			
+			// debug
+			System.out.println("\n" + management);
+			while (managements.next()) {
+				System.out.println(managements.getString("id")+"|"+managements.getString("name"));
+			}
+			System.out.println("\n" + thing);
+			while (things.next()) {
+				System.out.println(things.getString("id")+"|"+things.getString("name"));
+			}
+			System.out.println("\n" + property);
+			while (properties.next()) {
+				System.out.println(properties.getString("id")+"|"+properties.getString("name"));
+			}
+			
+			Database.save();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
 		/**
+		 * TODO general:
+		 * [ ] model with table as child or directly on model -> model.persist() => abstract model.persist();
+		 *  
 		 * TODO database:
 		 * [x] read in schema
 		 * [x] read in data
 		 * [?] check if schema and data is already read in
-		 * [ ] save queries executed since offline in change file to submit changes to server and not whole database (base64?)
+		 * [ ] save queries executed since offline in change file to submit changes to server and not whole database (base64?) -> log on (first check result e.g. insert: if id 0 => not inserted)
+		 * [ ] dump database on save (data & schema)
 		 * [ ] save whole db on server
 		 * [ ] recreate db from server back up
 		 * [ ] history of all queries on the server and/or local

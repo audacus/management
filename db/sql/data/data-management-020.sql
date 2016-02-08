@@ -27,6 +27,7 @@ insert or ignore into thing (name) values ('car')
 	, ('storey')
 	, ('multi-storey-car-park');
 -- properites
+-- delete from property;
 insert or ignore into property (name, thing, type, relation) values ('cars', 6, 1, 2)
 	, ('numberplate', 1, 4, 1)
 	, ('parking-lots', 6, 15, 2)

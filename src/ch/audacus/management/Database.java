@@ -26,21 +26,7 @@ public class Database {
 		}
 		return Database.sqlite.get();
 	}
-
-	private static SQLiteJDBC init() {
-		try {
-			Database.sqlite = new SQLiteJDBC(Database.DATABASE_NAME);
-			Database.database = Database.get();
-			if (Database.database.getSchema() == null) {
-				Database.executeSchema();
-				Database.executeData();
-			}
-		} catch (final Exception e) {
-			e.printStackTrace();
-		}
-		return Database.sqlite;
-	}
-
+	
 	public static String getName() {
 		if (Database.sqlite == null) {
 			Database.init();
@@ -60,6 +46,24 @@ public class Database {
 			Database.init();
 		}
 		return Database.sqlite.getFile();
+	}
+	
+	public static void save() {
+		// TODO 2016-02-08: manually dump content and schema with queries
+	}
+	
+	private static SQLiteJDBC init() {
+		try {
+			Database.sqlite = new SQLiteJDBC(Database.DATABASE_NAME);
+			Database.database = Database.get();
+			if (Database.database.getSchema() == null) {
+				Database.executeSchema();
+				Database.executeData();
+			}
+		} catch (final Exception e) {
+			e.printStackTrace();
+		}
+		return Database.sqlite;
 	}
 
 	private static void executeSchema() throws Exception {
