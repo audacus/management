@@ -1,8 +1,8 @@
 package ch.audacus.management.table;
 
-public class Relation extends ATable {
+public class TableRelation extends ATable {
 
-	public Relation() {
+	public TableRelation() {
 		super("relation", "id");
 	}
 }

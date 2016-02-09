@@ -9,9 +9,9 @@ public class Main {
 
 	public static void main(final String[] args) {
 		try {
-			Thing thing = new Thing();
-			Property property = new Property();
-			Management management = new Management();
+			TableThing thing = new TableThing();
+			TableProperty property = new TableProperty();
+			TableManagement management = new TableManagement();
 			ResultSet properties = property.getAll();
 			ResultSet things = thing.getAll();
 			ResultSet managements = management.getAll();

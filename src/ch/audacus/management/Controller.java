@@ -9,12 +9,12 @@ import ch.audacus.management.table.*;
 
 public class Controller {
 	
-	private static Instance instance;
-	private static Management management;
-	private static Property property;
-	private static Relation relation;
-	private static Thing thing;
-	private static Value value;
+	private static TableInstance instance;
+	private static TableManagement management;
+	private static TableProperty property;
+	private static TableRelation relation;
+	private static TableThing thing;
+	private static TableValue value;
 	
 	public static ResultSet createManagement(final String name) throws SQLException {
 		if (Controller.management == null) {
@@ -28,26 +28,26 @@ public class Controller {
 //	public static ResultSet createPropety()
 	
 	private static void initInstance() {
-		Controller.instance = new Instance();
+		Controller.instance = new TableInstance();
 	}
 
 	private static void initManagement() {
-		Controller.management = new Management();
+		Controller.management = new TableManagement();
 	}
 	
 	private static void initProperty() {
-		Controller.property = new Property();
+		Controller.property = new TableProperty();
 	}
 	
 	private static void initRelation() {
-		Controller.relation = new Relation();
+		Controller.relation = new TableRelation();
 	}
 	
 	private static void initThing() {
-		Controller.thing = new Thing();
+		Controller.thing = new TableThing();
 	}
 	
 	private static void initValue() {
-		Controller.value = new Value();
+		Controller.value = new TableValue();
 	}
 }

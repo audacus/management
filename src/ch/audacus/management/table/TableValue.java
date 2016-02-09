@@ -1,8 +1,8 @@
 package ch.audacus.management.table;
 
-public class Value extends ATable {
+public class TableValue extends ATable {
 
-	public Value() {
+	public TableValue() {
 		super("value", "id");
 	}
 }

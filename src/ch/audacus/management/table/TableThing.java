@@ -1,8 +1,8 @@
 package ch.audacus.management.table;
 
-public class Thing extends ATable {
+public class TableThing extends ATable {
 
-	public Thing() {
+	public TableThing() {
 		super("thing", "id");
 	}
 }
