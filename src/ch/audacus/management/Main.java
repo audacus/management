@@ -24,8 +24,6 @@ public class Main {
 				System.out.println("here");
 			}
 			
-			
-			
 			// debug
 			System.out.println("\n" + management);
 			while (managements.next()) {
