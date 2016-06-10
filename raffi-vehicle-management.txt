@@ -16,7 +16,7 @@ thing_type
 
 state
 	id
-	name (Solothurn, Graubünden, Aargau, etc)
+	name (Solothurn, GraubÃ¼nden, Aargau, etc)
 	short (SO, GR, AG, etc)
 
 numberplate
@@ -29,7 +29,7 @@ numberplate
 
 type
 	id
-	name (Privat, Militär, etc)
+	name (Privat, MilitÃ¤r, etc)
 	short (priv, mil, etc)
 
 driver
@@ -44,4 +44,4 @@ typ_felder
 
 feld_typ
 	id
-	name (date, dropdown, number, double/float, checkbox, 
+	name (date, dropdown, number, double/float, checkbox,
