@@ -3,27 +3,29 @@ package ch.audacus.management;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import ch.audacus.management.table.*;
+import ch.audacus.management.table.TableManagement;
+import ch.audacus.management.table.TableProperty;
+import ch.audacus.management.table.TableThing;
 
 public class Main {
 
 	public static void main(final String[] args) {
 		try {
-			TableThing thing = new TableThing();
-			TableProperty property = new TableProperty();
-			TableManagement management = new TableManagement();
-			ResultSet properties = property.getAll();
-			ResultSet things = thing.getAll();
-			ResultSet managements = management.getAll();
-			
+			final TableThing thing = new TableThing();
+			final TableProperty property = new TableProperty();
+			final TableManagement management = new TableManagement();
+			final ResultSet properties = property.getAll();
+			final ResultSet things = thing.getAll();
+			final ResultSet managements = management.getAll();
+
 			// work
-			Controller controller = new Controller();
-			
-			ResultSet inserted = controller.createManagement("vehicles");
+			final Controller controller = new Controller();
+
+			final ResultSet inserted = Controller.createManagement("vehicles");
 			while (inserted.next()) {
 				System.out.println("here");
 			}
-			
+
 			// debug
 			System.out.println("\n" + management);
 			while (managements.next()) {
@@ -37,16 +39,16 @@ public class Main {
 			while (properties.next()) {
 				System.out.println(properties.getString("id")+"|"+properties.getString("name"));
 			}
-			
+
 			Database.save();
-		} catch (SQLException e) {
+		} catch (final SQLException e) {
 			e.printStackTrace();
 		}
-		
+
 		/**
 		 * TODO general:
 		 * [ ] model with table as child or directly on model -> model.persist() => abstract model.persist();
-		 *  
+		 *
 		 * TODO database:
 		 * [x] read in schema
 		 * [x] read in data

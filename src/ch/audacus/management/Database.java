@@ -26,7 +26,7 @@ public class Database {
 		}
 		return Database.sqlite.get();
 	}
-	
+
 	public static String getName() {
 		if (Database.sqlite == null) {
 			Database.init();
@@ -47,11 +47,11 @@ public class Database {
 		}
 		return Database.sqlite.getFile();
 	}
-	
+
 	public static void save() {
 		// TODO 2016-02-08: manually dump content and schema with queries
 	}
-	
+
 	private static SQLiteJDBC init() {
 		try {
 			Database.sqlite = new SQLiteJDBC(Database.DATABASE_NAME);
@@ -84,7 +84,6 @@ public class Database {
 
 		for (final File file : files.listFiles(new FilenameFilter() {
 
-			@Override
 			public boolean accept(final File dir, final String name) {
 				return name.startsWith(type + Database.NAME_SEPARATOR + Database.DATABASE_NAME) && name.endsWith("." + Database.SQL);
 			}

@@ -7,7 +7,7 @@ import java.sql.DriverManager;
 public class SQLiteJDBC {
 
 	private static final String DATABASE_PATH = "db";
-	private static final String DATABASE_NAME = "database";
+	private static final String DATABASE_NAME = "management";
 	private File path;
 	private String name;
 	private File database;
