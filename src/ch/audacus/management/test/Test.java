@@ -5,11 +5,11 @@ import java.sql.SQLException;
 public class Test {
 
 	public static void main(final String[] args) {
-		//		final int id = 1;
-		//		final Thing thing = null;
+		//		int id = 1;
+		//		Thing thing = null;
 		//		while ((thing = new Thing().fromId(id)).getName() != null) {
 		//			System.out.println("properties from " + thing.getName());
-		//			thing.getProperties().forEach(property -> System.out.println(property + "|" + property.getName()))	;
+		//			thing.getProperties().forEach(property -> System.out.println(property + "|" + property.getName()));
 		//			id++;
 		//		}
 		final Instance tmp = new Instance();

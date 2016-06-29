@@ -7,6 +7,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -110,17 +112,24 @@ public class Database {
 
 	public static ResultSet persist(final AEntity entity) throws SQLException {
 		final Map<String, Object> map = entity.toMap();
-		final PreparedStatement statement = null;
+		final List<Object> values = new ArrayList<Object>(map.values());
+		PreparedStatement statement = null;
 		// set up insert string with table and fields
-		map.keySet().forEach(e -> System.out.println(e));
-		final StringBuilder sql = new StringBuilder(String.format(Database.INSERT, new Object[] { 
+		final StringBuilder sql = new StringBuilder(String.format(Database.INSERT, new Object[] {
 				entity.table, 
-				map.keySet().stream().collect(Collectors.joining(", ")), 
-				map.values().stream().collect(Collectors.toList(e -> e = "?")).stream().collect(Collectors.joining(", ")) 
+				map.keySet().stream().collect(Collectors.joining(", ")),
+				map.values().stream().map(e -> { return "?"; }).collect(Collectors.joining(", "))
+				 
 		}));
-
-		System.out.println(sql);
-
+		
+		// add values
+		statement = Database.get().prepareStatement(sql.toString());
+		for (int i = 1; i <= values.size(); i++) {
+			statement.setObject(i, values.get(i-1));
+		}
+		System.out.println(statement.toString());
+		// TODO: execute insert
+		
 		//		statement.executeUpdate();
 		//		final ResultSet keys = statement.getGeneratedKeys();
 		//		final ResultSet inserted = Database.getByPrimary(entity, keys.getInt(keys.getMetaData().getColumnLabel(1)));
@@ -131,6 +140,14 @@ public class Database {
 	}
 
 	public static List<ResultSet> persist(final AEntity... entities) throws SQLException {
-		return Arrays.stream(entities).collect(Collectors.toList(e -> Database.persist(e)));
+		return Arrays.stream(entities).map(entity -> {
+			ResultSet result = null;
+			try {
+				result = Database.persist(entity);
+			} catch (final SQLException e) {
+				e.printStackTrace();
+			}
+			return result;
+		}).collect(Collectors.toList());
 	}
 }
