@@ -1,20 +1,30 @@
 package ch.audacus.management.test;
 
-public class Field<T> {
+public class Field<V extends Object> {
 
-	protected T value;
+	private String name;
+	private V value;
 
 	public Field() {}
 
-	public Field(final T value) {
-		this.set(value);
+	public Field(final String name, final V value) {
+		this.name = name;
+		this.setValue(value);
 	}
 
-	public T get() {
+	public String getName() {
+		return this.name;
+	}
+
+	public void setName(final String name) {
+		this.name = name;
+	}
+
+	public V getValue() {
 		return this.value;
 	}
 
-	public T set(final T value) {
-		return this.value = value;
+	public void setValue(final V value) {
+		this.value = value;
 	}
 }
