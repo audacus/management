@@ -1,4 +1,4 @@
-package ch.audacus.management.test;
+package ch.audacus.management.core;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -35,6 +35,11 @@ public class Relation extends AEntity {
 			e.printStackTrace();
 		}
 		return relation;
+	}
+
+	@Override
+	public Relation fromResultSet(final ResultSet result) {
+		return new Relation(result);
 	}
 
 	@Override

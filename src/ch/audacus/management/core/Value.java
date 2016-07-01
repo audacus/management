@@ -1,4 +1,4 @@
-package ch.audacus.management.test;
+package ch.audacus.management.core;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -39,6 +39,11 @@ public class Value<V> extends AEntity {
 			e.printStackTrace();
 		}
 		return value;
+	}
+
+	@Override
+	public Value fromResultSet(final ResultSet result) {
+		return new Value(result);
 	}
 
 	@Override

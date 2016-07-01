@@ -1,4 +1,4 @@
-package ch.audacus.management.test;
+package ch.audacus.management.core;
 
 public class Field<V extends Object> {
 

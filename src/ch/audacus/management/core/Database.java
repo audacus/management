@@ -1,4 +1,4 @@
-package ch.audacus.management.test;
+package ch.audacus.management.core;
 
 import java.io.File;
 import java.io.FilenameFilter;
@@ -10,10 +10,8 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -35,40 +33,57 @@ public class Database {
 
 	private static Connection connection;
 
-	public static Connection init() {
+	public static void init() {
 		final File path = new File(Database.DATABASE_PATH);
 		if (!path.isDirectory()) {
-			if (!path.mkdir()) {
+			if (!path.mkdirs()) {
 				new Exception("failed to create directory: " + path.getPath()).printStackTrace();
 			}
 		}
-		final File database = new File(path.getPath(), new File(Database.DATABASE_NAME).getPath() + "." + Database.DATABASE_FILE_ENDING);
 		try {
+			final File database = new File(path, new File(Database.DATABASE_NAME).getPath() + "." + Database.DATABASE_FILE_ENDING);
+			if (!database.exists()) {
+				if (!database.createNewFile()) {
+					new Exception("failed to create file: " + database.getPath()).printStackTrace();
+				}
+			}
 			Class.forName("org.sqlite.JDBC");
 			Database.connection = DriverManager.getConnection("jdbc:sqlite:" + database.getPath());
-			System.out.println(Database.connection.getCatalog());
+			System.out.println("opened connection: " + database.getPath() + "\n");
 		} catch (final Exception e) {
 			e.printStackTrace();
 		}
-		System.out.println("opened connection: " + database.getPath() + "\n");
-		return Database.connection;
 	}
 
 	public static Connection get() {
 		if (Database.connection == null) {
 			Database.init();
 			try {
-				// TODO: getCatalog() | getSchema() == null ?!?!
-				System.out.println(Database.connection.getSchema());
-				if (Database.connection.getSchema() == null) {
+				// try to create a statement -> if fail -> no tables/schema
+				final PreparedStatement statement = Database.connection.prepareStatement("SELECT * FROM sqlite_master WHERE type='table';");
+				statement.closeOnCompletion();
+				final ResultSet result = statement.executeQuery();
+				// when no table is in the database -> setup
+				if (!result.next()) {
+					System.out.println("setup db");
 					Database.executeSchema();
 					Database.executeData();
 				}
-			} catch (Exception e) {
+			} catch (final Exception e) {
 				e.printStackTrace();
 			}
 		}
 		return Database.connection;
+	}
+
+	public static ResultSet getByPrimary(final Class<AEntity> clazz, final int... primaries) throws SQLException {
+		ResultSet result = null;
+		try {
+			result = Database.getByPrimary(clazz.newInstance(), primaries);
+		} catch (final InstantiationException | IllegalAccessException e) {
+			e.printStackTrace();
+		}
+		return result;
 	}
 
 	public static ResultSet getByPrimary(final AEntity entity, final int... primaries) throws SQLException {
@@ -79,6 +94,16 @@ public class Database {
 			}
 		}
 		return Database.getByFields(entity, list);
+	}
+
+	public static ResultSet getByFields(final Class<AEntity> clazz, final List<Field> fields) throws SQLException {
+		ResultSet result = null;
+		try {
+			result = Database.getByFields(clazz.newInstance(), fields);
+		} catch (final InstantiationException | IllegalAccessException e) {
+			e.printStackTrace();
+		}
+		return result;
 	}
 
 	public static ResultSet getByFields(final AEntity entity, final List<Field> fields) throws SQLException {
@@ -130,7 +155,26 @@ public class Database {
 			// execute select without wheres
 			statement = Database.get().prepareStatement(sql.toString());
 		}
+		statement.closeOnCompletion();
 		return statement.executeQuery();
+	}
+
+	public static List<AEntity> resultSetToList(final Class<AEntity> clazz, final ResultSet result) throws SQLException {
+		List<AEntity> list = null;
+		try {
+			list = Database.resultSetToList(clazz.newInstance(), result);
+		} catch (InstantiationException | IllegalAccessException e) {
+			e.printStackTrace();
+		}
+		return list;
+	}
+
+	public static List<AEntity> resultSetToList(final AEntity entity, final ResultSet result) throws SQLException{
+		final List<AEntity> list = new ArrayList<>();
+		while (result.next()) {
+			list.add(entity.fromResultSet(result));
+		}
+		return list;
 	}
 
 	public static ResultSet persist(final AEntity entity) throws SQLException {
@@ -138,15 +182,13 @@ public class Database {
 		final List<Object> values = new ArrayList<Object>(map.values());
 		PreparedStatement statement = null;
 		// set up insert string with table and fields
-		final StringBuilder sql = new StringBuilder(String.format(Database.INSERT, new Object[] {
-				entity.table,
-				map.keySet().stream().collect(Collectors.joining(", ")),
-				map.values().stream().map(e -> {
-					return "?";
-				}).collect(Collectors.joining(", ")) }));
+		final StringBuilder sql = new StringBuilder(String.format(Database.INSERT, new Object[] { entity.table, map.keySet().stream().collect(Collectors.joining(", ")), map.values().stream().map(e -> {
+			return "?";
+		}).collect(Collectors.joining(", ")) }));
 
 		// add values
 		statement = Database.get().prepareStatement(sql.toString());
+		statement.closeOnCompletion();
 		for (int i = 1; i <= values.size(); i++) {
 			Object value = values.get(i - 1);
 			// do not allow insert of id 0
@@ -178,30 +220,27 @@ public class Database {
 		}).collect(Collectors.toList());
 	}
 
-	private static void executeSchema() throws Exception {
+	private static void executeSchema() {
 		Database.readSqlFile(Database.SQL_SCHEMA);
 	}
 
-	private static void executeData() throws Exception {
+	private static void executeData() {
 		Database.readSqlFile(Database.SQL_DATA);
 	}
 
-	private static void readSqlFile(final String type) throws Exception {
+	private static void readSqlFile(final String type) {
 		final File files = new File(Database.DATABASE_PATH, new File(Database.SQL, type).getPath());
 		if (!files.isDirectory()) {
 			if (!files.mkdirs()) {
-				throw new Exception("failed to create directories: " + files.getPath());
+				try {
+					throw new Exception("failed to create directories: " + files.getPath());
+				} catch (final Exception e) {
+					e.printStackTrace();
+				}
 			}
 		}
 
-		for (final File file : files.listFiles(new FilenameFilter() {
-
-			public boolean accept(final File dir, final String name) {
-				return name.startsWith(type + Database.NAME_SEPARATOR + Database.DATABASE_NAME) && name.endsWith("." + Database.SQL);
-			}
-		})) {
-			Database.executeSql(file);
-		}
+		Arrays.stream(files.listFiles((FilenameFilter) (dir, name) -> name.startsWith(type + Database.NAME_SEPARATOR + Database.DATABASE_NAME) && name.endsWith("." + Database.SQL))).forEach(file -> Database.executeSql(file));
 	}
 
 	private static void executeSql(final File sql) {
@@ -213,12 +252,13 @@ public class Database {
 	}
 
 	private static void executeSql(final String sql) {
-		System.out.println("execute: \n" + sql);
+		//		System.out.println("execute: \n" + sql);
 		try {
 			Database.get().createStatement().executeUpdate(sql);
-			System.out.println("sql executed successfully\n");
+			System.out.println("sql executed successfully");
 		} catch (final SQLException e) {
-			System.out.println("could not execute sql: " + e.getMessage() + "\n");
+			System.err.println("sql could not be executed");
+			//			e.printStackTrace();
 		}
 	}
 }

@@ -1,4 +1,4 @@
-package ch.audacus.management.test;
+package ch.audacus.management.core;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -46,6 +46,8 @@ abstract public class AEntity {
 	}
 
 	abstract public <T extends AEntity> T fromId(final int id);
+
+	abstract public <T extends AEntity> T fromResultSet(ResultSet result);
 
 	abstract public Map<String, Object> toMap();
 
