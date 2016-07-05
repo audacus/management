@@ -71,7 +71,7 @@ public class Thing extends AEntity {
 	// additional
 	public List<Property> getProperties() {
 		final List<Property> properties = new ArrayList<>();
-		final List<Field> fields = new ArrayList<>();
+		final List<Field<?>> fields = new ArrayList<>();
 		fields.add(new Field<Thing>("thing", this));
 		try {
 			final ResultSet result = Database.getByFields(new Property(), fields);

@@ -70,6 +70,16 @@ abstract public class AEntity {
 		return this;
 	}
 
+	public Class<?> getPropertyType(final String name) {
+		Class<?> clazz = null;
+		try {
+			clazz = PropertyUtils.getPropertyType(this, name);
+		} catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+			e.printStackTrace();
+		}
+		return clazz;
+	}
+
 	public int toInt() throws NumberFormatException {
 		return Integer.parseInt(String.valueOf(this));
 	}

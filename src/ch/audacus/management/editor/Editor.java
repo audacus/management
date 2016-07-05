@@ -26,6 +26,7 @@ public class Editor extends JFrame {
 	 * Create the frame.
 	 */
 	public Editor() {
+		super();
 		// setup database
 		Database.get();
 		this.setTitle("Editor");
@@ -52,7 +53,6 @@ public class Editor extends JFrame {
 
 	public void setView(final AView view) {
 		this.setContentPane(view);
-		this.validate();
 		this.pack();
 		this.setLocationRelativeTo(null);
 		System.out.println("view: " + view.getClass().getSimpleName());

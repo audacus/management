@@ -76,7 +76,7 @@ public class Database {
 		return Database.connection;
 	}
 
-	public static ResultSet getByPrimary(final Class<AEntity> clazz, final int... primaries) throws SQLException {
+	public static ResultSet getByPrimary(final Class<? extends AEntity> clazz, final int... primaries) throws SQLException {
 		ResultSet result = null;
 		try {
 			result = Database.getByPrimary(clazz.newInstance(), primaries);
@@ -87,7 +87,7 @@ public class Database {
 	}
 
 	public static ResultSet getByPrimary(final AEntity entity, final int... primaries) throws SQLException {
-		final List<Field> list = new ArrayList<>();
+		final List<Field<?>> list = new ArrayList<>();
 		for (int i = 0; i < primaries.length; i++) {
 			if (entity.primaries.length > i) {
 				list.add(new Field<Integer>(entity.primaries[i], new Integer(primaries[i])));
@@ -96,7 +96,7 @@ public class Database {
 		return Database.getByFields(entity, list);
 	}
 
-	public static ResultSet getByFields(final Class<AEntity> clazz, final List<Field> fields) throws SQLException {
+	public static ResultSet getByFields(final Class<? extends AEntity> clazz, final List<Field<?>> fields) throws SQLException {
 		ResultSet result = null;
 		try {
 			result = Database.getByFields(clazz.newInstance(), fields);
@@ -106,7 +106,7 @@ public class Database {
 		return result;
 	}
 
-	public static ResultSet getByFields(final AEntity entity, final List<Field> fields) throws SQLException {
+	public static ResultSet getByFields(final AEntity entity, final List<Field<?>> fields) throws SQLException {
 		PreparedStatement statement = null;
 		// set up select string with table name
 		final StringBuilder sql = new StringBuilder(String.format(Database.SELECT, entity.table));
@@ -140,7 +140,7 @@ public class Database {
 				// add values
 				statement = Database.get().prepareStatement(sql.toString());
 				for (int i = 1; i <= fieldssize; i++) {
-					final Field field = fields.get(i - 1);
+					final Field<?> field = fields.get(i - 1);
 					final Object value = field.getValue();
 					if (value instanceof Integer || value instanceof AEntity) {
 						// number
@@ -159,8 +159,8 @@ public class Database {
 		return statement.executeQuery();
 	}
 
-	public static List<AEntity> resultSetToList(final Class<AEntity> clazz, final ResultSet result) throws SQLException {
-		List<AEntity> list = null;
+	public static List<? extends AEntity> resultSetToList(final Class<? extends AEntity> clazz, final ResultSet result) throws SQLException {
+		List<? extends AEntity> list = null;
 		try {
 			list = Database.resultSetToList(clazz.newInstance(), result);
 		} catch (InstantiationException | IllegalAccessException e) {
@@ -169,8 +169,8 @@ public class Database {
 		return list;
 	}
 
-	public static List<AEntity> resultSetToList(final AEntity entity, final ResultSet result) throws SQLException{
-		final List<AEntity> list = new ArrayList<>();
+	public static List<? extends AEntity> resultSetToList(final AEntity entity, final ResultSet result) throws SQLException{
+		final List<? extends AEntity> list = new ArrayList<>();
 		while (result.next()) {
 			list.add(entity.fromResultSet(result));
 		}
