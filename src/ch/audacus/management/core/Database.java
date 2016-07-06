@@ -24,12 +24,11 @@ public class Database {
 	private static final String SQL = "sql";
 	private static final String SQL_SCHEMA = "schema";
 	private static final String SQL_DATA = "data";
-	private static final String SQL_HISTORY = "history";
 	private static final char NAME_SEPARATOR = '-';
 
 	private static final String SELECT = "select * from %s where 1 = 1";
 	private static final String SELECT_WHERE = " and (%s);";
-	private static final String INSERT = "insert or ignore into %s (%s) values (%s);";
+	private static final String INSERT = "insert or replace into %s (%s) values (%s);";
 
 	private static Connection connection;
 

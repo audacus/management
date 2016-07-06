@@ -7,8 +7,8 @@ import javax.swing.border.EmptyBorder;
 
 public class Main extends AView {
 
-	public Main(final Editor parent) {
-		super(parent);
+	public Main(final Editor editor) {
+		super(editor);
 		this.editor.setSize(300, 100);
 		this.setBorder(new EmptyBorder(5, 5, 5, 5));
 		this.setLayout(new GridLayout(1, 0, 0, 0));

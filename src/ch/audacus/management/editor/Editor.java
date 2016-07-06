@@ -1,12 +1,16 @@
 package ch.audacus.management.editor;
 
 import java.awt.EventQueue;
+import java.util.LinkedList;
 
 import javax.swing.JFrame;
+import javax.swing.JPanel;
 
 import ch.audacus.management.core.Database;
 
 public class Editor extends JFrame {
+
+	protected LinkedList<JPanel> history = new LinkedList<>();
 
 	/**
 	 * Launch the application.
@@ -52,9 +56,17 @@ public class Editor extends JFrame {
 	}
 
 	public void setView(final AView view) {
+		this.history.add(view);
 		this.setContentPane(view);
 		this.pack();
 		this.setLocationRelativeTo(null);
 		System.out.println("view: " + view.getClass().getSimpleName());
+		System.out.println("history:");
+		this.history.forEach(i -> System.out.print(" "+ i.getClass().getSimpleName()));
+	}
+
+	public void back() {
+		this.history.pollLast();
+		this.setView((AView) this.history.getLast());
 	}
 }

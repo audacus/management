@@ -6,8 +6,8 @@ public abstract class AView extends JPanel {
 
 	protected Editor editor;
 
-	public AView(final Editor parent) {
+	public AView(final Editor editor) {
 		super();
-		this.editor = parent;
+		this.editor = editor;
 	}
 }
