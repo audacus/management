@@ -61,12 +61,10 @@ public class Editor extends JFrame {
 		this.pack();
 		this.setLocationRelativeTo(null);
 		System.out.println("view: " + view.getClass().getSimpleName());
-		System.out.println("history:");
-		this.history.forEach(i -> System.out.print(" "+ i.getClass().getSimpleName()));
 	}
 
 	public void back() {
 		this.history.pollLast();
-		this.setView((AView) this.history.getLast());
+		this.setView((AView) this.history.pollLast());
 	}
 }
