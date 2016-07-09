@@ -9,8 +9,10 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
@@ -19,18 +21,21 @@ import javax.swing.SpringLayout;
 
 import ch.audacus.management.core.AEntity;
 import ch.audacus.management.core.Database;
+import ch.audacus.management.core.Property;
 
 // http://docs.oracle.com/javase/tutorial/displayCode.html?code=http://docs.oracle.com/javase/tutorial/uiswing/examples/components/FormattedTextFieldDemoProject/src/components/FormattedTextFieldDemo.java
-public class EntityEditor extends AView implements PropertyChangeListener {
+public class EntityEditor extends AView implements PropertyChangeListener, IItemView {
 
 	protected AEntity entity;
+	protected IItemView itemView;
 	protected Map<String, JComponent> fields = new HashMap<>();
 	protected List<JFormattedTextField> fieldsInt = new ArrayList<>();
 	protected List<JFormattedTextField> fieldsDouble = new ArrayList<>();
 
-	public EntityEditor(final Editor editor, final AEntity entity) {
+	public EntityEditor(final Editor editor, final AEntity entity, final IItemView itemView) {
 		super(editor);
 		this.entity = entity;
+		this.itemView = itemView;
 		this.initEditor();
 	}
 
@@ -38,11 +43,58 @@ public class EntityEditor extends AView implements PropertyChangeListener {
 	// TODO: [ ] Instance, [ ]Management, [ ] Property, [ ] Relation, [ ] Thing, [ ] Value
 	private void initEditor() {
 		this.setLayout(new SpringLayout());
-		final Map<String, Object> map = this.entity.toMap();
+
+		this.addFields(this.entity.toMap());
+
+		// cancel and save buttons
+		final JButton cancel = new JButton("cancel");
+		cancel.addActionListener(e ->
+
+		{
+			this.editor.back();
+		});
+
+		final JButton save = new JButton("save");
+		save.addActionListener(e ->
+
+		{
+			this.fields.forEach((key, value) -> {
+				switch (value.getClass().getSimpleName()) {
+					case "JTextField":
+					case "JFormattedTextField":
+						this.entity.set(key, ((JTextField) value).getText());
+						break;
+					default:
+						// do nothing
+				}
+				try {
+					System.out.println("save: " + this.entity.toMap());
+					Database.persist(this.entity);
+					this.itemView.reload();
+					this.editor.back();
+				} catch (final SQLException ex) {
+					if (ex.getMessage().startsWith("[SQLITE_BUSY]")) {
+						this.editor.showMessage(EMessage.DATABASE_LOCKED);
+					} else {
+						ex.printStackTrace();
+					}
+				}
+			});
+		});
+		this.add(cancel);
+		this.add(save);
+		SpringUtilities.makeCompactGrid(this, this.fields.size() + 1, 2, 6, 6, 6, 6);
+
+	}
+
+	private void addFields(final Map<String, Object> map) {
 		System.out.println("open: " + map);
-		map.forEach((key, value) -> {
-			if (Arrays.stream(this.entity.primaries).anyMatch(p -> p != key)) {
-				final Class<?> clazz = this.entity.getPropertyType(key);
+		for (final Entry<String, Object> entry : map.entrySet()) {
+			final String key = entry.getKey();
+			final Object value = entry.getValue();
+			if (value != null && Arrays.stream(this.entity.primaries).anyMatch(p -> p != key)) {
+				final Class<?> clazz = value.getClass();
+				System.out.println("property: " + key + " -> " + clazz.getName());
 				switch (clazz.getSimpleName()) {
 					case "int":
 					case "Integer":
@@ -51,7 +103,7 @@ public class EntityEditor extends AView implements PropertyChangeListener {
 						if (value != null) {
 							fieldInt.setValue(new Integer(value.toString()));
 						}
-						fieldInt.addPropertyChangeListener(this);
+						fieldInt.addPropertyChangeListener("integer", this);
 						final JLabel labelInt = new JLabel(key);
 						labelInt.setLabelFor(fieldInt);
 						this.add(labelInt);
@@ -68,7 +120,7 @@ public class EntityEditor extends AView implements PropertyChangeListener {
 						if (value != null) {
 							fieldDouble.setValue(new Double(value.toString()));
 						}
-						fieldDouble.addPropertyChangeListener(this);
+						fieldDouble.addPropertyChangeListener("double", this);
 						final JLabel labelDouble = new JLabel(key);
 						labelDouble.setLabelFor(fieldDouble);
 						this.add(labelDouble);
@@ -88,61 +140,58 @@ public class EntityEditor extends AView implements PropertyChangeListener {
 						this.add(fieldString);
 						this.fields.put(key, fieldString);
 						break;
-						//				case "Property":
-						//					final Property property = (Property) value;
-						//					if (property.getRelation().getName() == "multiple") {
-						//						try {
-						//							final List<? extends AEntity> listProperty = Database.resultSetToList(property, Database.getByFields(new Property(), null));
-						//							final JComboBox<Property> comboProperty = new JComboBox<>(listProperty.toArray(new Property[listProperty.size()]));
-						//							this.add(comboProperty);
-						//						} catch (final SQLException e) {
-						//							e.printStackTrace();
-						//						}
-						//					} else {
-						//
-						//					}
-						//					break;
-					default:
-						// do nothing
-				}
-			}
-		});
-		// cancel and save buttons
-		final JButton cancel = new JButton("cancel");
-		cancel.addActionListener(e -> {
-			this.editor.back();
-		});
-		final JButton save = new JButton("save");
-		save.addActionListener(e -> {
-			this.fields.forEach((key, value) -> {
-				switch (value.getClass().getSimpleName()) {
-					case "JTextField":
-					case "JFormattedTextField":
-						this.entity.set(key, ((JTextField) value).getText());
+						// properties
+					case "ArrayList":
+						final List<Property> list = (List<Property>) value;
+						list.forEach(property -> {
+							final String name = property.getName();
+							final JButton btnProperty = new JButton(property.getType().getName());
+							btnProperty.setName(name);
+							btnProperty.addActionListener(e -> {
+								this.editor.setView(new EntityEditor(this.editor, property, this.itemView));
+							});
+							final JLabel labelProperty = new JLabel(name);
+							labelProperty.setLabelFor(btnProperty);
+							this.add(labelProperty);
+							this.add(btnProperty);
+							this.fields.put(name, btnProperty);
+						});
+						break;
+					case "Thing":
+						break;
+					case "Relation":
 						break;
 					default:
 						// do nothing
 				}
-				try {
-					System.out.println("save: " + this.entity.toMap());
-					Database.persist(this.entity);
-					this.editor.back();
-				} catch (final SQLException ex) {
-					ex.printStackTrace();
-				}
-			});
-		});
-		this.add(cancel);
-		this.add(save);
-		SpringUtilities.makeCompactGrid(this, map.size() - this.entity.primaries.length + 1, 2, 6, 6, 6, 6);
+			}
+		}
+	}
+
+	public JComboBox<? extends AEntity> createCombobox(final AEntity entity) {
+		final JComboBox<? extends AEntity> combo = null;
+		// TODO: combobox for editing things
+		// TODO: combobox for selecting values of an instance
+		// TODO: revalidate previous todos -> where do i need entity editor and how will the fields be & what are the values of the fields
+		return combo;
+	}
+
+	@Override
+	public void reload() {
+		// reload entity from database
 	}
 
 	@Override
 	public void propertyChange(final PropertyChangeEvent evt) {
-		if (this.fieldsInt.contains(evt.getSource())) {
-
-		} else if (this.fieldsDouble.contains(evt.getSource())) {
-
+		switch (evt.getPropertyName()) {
+			case "integer":
+				System.out.println("integer changed");
+				break;
+			case "double":
+				System.out.println("double changed");
+				break;
+			default:
+				// do nothing
 		}
 	}
 }

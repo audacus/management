@@ -35,7 +35,7 @@ abstract public class AEntity {
 					if (instance instanceof AEntity) {
 						final Method method = instance.getClass().getMethod("fromId", int.class);
 						if (method != null) {
-							method.invoke(instance, Integer.parseInt(String.valueOf(value)));
+							this.set(name, method.invoke(instance, Integer.parseInt(String.valueOf(value))));
 						}
 					}
 				}

@@ -20,12 +20,10 @@ public class Craft extends AView {
 		// thing
 		final JButton btnThing = new JButton("thing");
 		btnThing.setAlignmentX(Component.CENTER_ALIGNMENT);
+		btnThing.addActionListener(e -> {
+			this.editor.setView(EView.CRAFT_THING);
+		});
 		this.add(btnThing);
-		// TODO: what is this?
-		// something
-		final JButton btnSomething = new JButton("something");
-		btnSomething.setAlignmentX(Component.CENTER_ALIGNMENT);
-		this.add(btnSomething);
 		// back
 		final JButton btnBack = new JButton("back..");
 		btnBack.setAlignmentX(Component.CENTER_ALIGNMENT);

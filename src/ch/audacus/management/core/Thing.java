@@ -49,6 +49,7 @@ public class Thing extends AEntity {
 		final Map<String, Object> map = new HashMap<>();
 		map.put("id", this.getId());
 		map.put("name", this.getName());
+		map.put("properties", this.getProperties());
 		return map;
 	}
 

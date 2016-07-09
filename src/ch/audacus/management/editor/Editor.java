@@ -4,6 +4,7 @@ import java.awt.EventQueue;
 import java.util.LinkedList;
 
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 import ch.audacus.management.core.Database;
@@ -49,6 +50,9 @@ public class Editor extends JFrame {
 			case CRAFT_MANAGEMENT:
 				this.setView(new CraftManagement(this));
 				break;
+			case CRAFT_THING:
+				this.setView(new CraftThing(this));
+				break;
 			default:
 				// do nothing
 				break;
@@ -66,5 +70,9 @@ public class Editor extends JFrame {
 	public void back() {
 		this.history.pollLast();
 		this.setView((AView) this.history.pollLast());
+	}
+
+	public void showMessage(final EMessage message) {
+		JOptionPane.showMessageDialog(this, message);
 	}
 }
