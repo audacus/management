@@ -40,7 +40,8 @@ public class EntityEditor extends AView implements PropertyChangeListener, IItem
 	}
 
 	// TODO: NumberFormat integer, double, string
-	// TODO: [ ] Instance, [ ]Management, [ ] Property, [ ] Relation, [ ] Thing, [ ] Value
+	// TODO: [ ] Instance, [ ]Management, [ ] Property, [ ] Relation, [ ] Thing,
+	// [ ] Value
 	private void initEditor() {
 		this.setLayout(new SpringLayout());
 
@@ -92,8 +93,13 @@ public class EntityEditor extends AView implements PropertyChangeListener, IItem
 		for (final Entry<String, Object> entry : map.entrySet()) {
 			final String key = entry.getKey();
 			final Object value = entry.getValue();
-			if (value != null && Arrays.stream(this.entity.primaries).anyMatch(p -> p != key)) {
-				final Class<?> clazz = value.getClass();
+			if (Arrays.stream(this.entity.primaries).anyMatch(p -> p != key)) {
+				Class<?> clazz = null;
+				if (key != null) {
+					clazz = this.entity.getPropertyType(key);
+				} else {
+					clazz = key.getClass();
+				}
 				System.out.println("property: " + key + " -> " + clazz.getName());
 				switch (clazz.getSimpleName()) {
 					case "int":
@@ -140,22 +146,24 @@ public class EntityEditor extends AView implements PropertyChangeListener, IItem
 						this.add(fieldString);
 						this.fields.put(key, fieldString);
 						break;
-						// properties
-					case "ArrayList":
-						final List<Property> list = (List<Property>) value;
-						list.forEach(property -> {
-							final String name = property.getName();
-							final JButton btnProperty = new JButton(property.getType().getName());
-							btnProperty.setName(name);
-							btnProperty.addActionListener(e -> {
-								this.editor.setView(new EntityEditor(this.editor, property, this.itemView));
+					// properties
+					case "List":
+						if (value != null) {
+							final List<Property> list = (List<Property>) value;
+							list.forEach(property -> {
+								final String name = property.getName();
+								final JButton btnProperty = new JButton(property.getType().getName());
+								btnProperty.setName(name);
+								btnProperty.addActionListener(e -> {
+									this.editor.setView(new EntityEditor(this.editor, property, this.itemView));
+								});
+								final JLabel labelProperty = new JLabel(name);
+								labelProperty.setLabelFor(btnProperty);
+								this.add(labelProperty);
+								this.add(btnProperty);
+								this.fields.put(name, btnProperty);
 							});
-							final JLabel labelProperty = new JLabel(name);
-							labelProperty.setLabelFor(btnProperty);
-							this.add(labelProperty);
-							this.add(btnProperty);
-							this.fields.put(name, btnProperty);
-						});
+						}
 						break;
 					case "Thing":
 						break;
@@ -172,7 +180,8 @@ public class EntityEditor extends AView implements PropertyChangeListener, IItem
 		final JComboBox<? extends AEntity> combo = null;
 		// TODO: combobox for editing things
 		// TODO: combobox for selecting values of an instance
-		// TODO: revalidate previous todos -> where do i need entity editor and how will the fields be & what are the values of the fields
+		// TODO: revalidate previous todos -> where do i need entity editor and
+		// how will the fields be & what are the values of the fields
 		return combo;
 	}
 
