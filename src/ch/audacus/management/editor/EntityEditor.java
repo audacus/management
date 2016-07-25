@@ -49,16 +49,12 @@ public class EntityEditor extends AView implements PropertyChangeListener, IItem
 
 		// cancel and save buttons
 		final JButton cancel = new JButton("cancel");
-		cancel.addActionListener(e ->
-
-		{
+		cancel.addActionListener(e -> {
 			this.editor.back();
 		});
 
 		final JButton save = new JButton("save");
-		save.addActionListener(e ->
-
-		{
+		save.addActionListener(e -> {
 			this.fields.forEach((key, value) -> {
 				switch (value.getClass().getSimpleName()) {
 					case "JTextField":
@@ -69,7 +65,6 @@ public class EntityEditor extends AView implements PropertyChangeListener, IItem
 						// do nothing
 				}
 				try {
-					System.out.println("save: " + this.entity.toMap());
 					Database.persist(this.entity);
 					this.itemView.reload();
 					this.editor.back();
@@ -88,9 +83,9 @@ public class EntityEditor extends AView implements PropertyChangeListener, IItem
 
 	}
 
-	private void addFields(final Map<String, Object> map) {
+	private void addFields(final Map<String, ? extends Object> map) {
 		System.out.println("open: " + map);
-		for (final Entry<String, Object> entry : map.entrySet()) {
+		for (final Entry<String, ? extends Object> entry : map.entrySet()) {
 			final String key = entry.getKey();
 			final Object value = entry.getValue();
 			if (Arrays.stream(this.entity.primaries).anyMatch(p -> p != key)) {
@@ -146,7 +141,7 @@ public class EntityEditor extends AView implements PropertyChangeListener, IItem
 						this.add(fieldString);
 						this.fields.put(key, fieldString);
 						break;
-					// properties
+						// properties
 					case "List":
 						if (value != null) {
 							final List<Property> list = (List<Property>) value;

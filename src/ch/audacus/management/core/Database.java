@@ -168,7 +168,7 @@ public class Database {
 		return list;
 	}
 
-	public static List<? extends AEntity> resultSetToList(final AEntity entity, final ResultSet result) throws SQLException{
+	public static List<? extends AEntity> resultSetToList(final AEntity entity, final ResultSet result) throws SQLException {
 		final List<? extends AEntity> list = new ArrayList<>();
 		while (result.next()) {
 			list.add(entity.fromResultSet(result));
@@ -177,7 +177,8 @@ public class Database {
 	}
 
 	public static ResultSet persist(final AEntity entity) throws SQLException {
-		final Map<String, Object> map = entity.toMap();
+		final Map<String, ? extends Object> map = entity.toPersistMap();
+		System.out.println("persist: " + map);
 		final List<Object> values = new ArrayList<Object>(map.values());
 		PreparedStatement statement = null;
 		// set up insert string with table and fields

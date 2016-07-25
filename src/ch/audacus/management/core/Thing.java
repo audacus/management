@@ -11,6 +11,8 @@ public class Thing extends AEntity {
 
 	private int id;
 	private String name;
+	// TODO: does not yet work -> takes only ignoreOnPersist from AEntity ?!?!
+	public String[] ignoreOnPersist = new String[] { "properties" };
 
 	public Thing() {
 		super();
@@ -45,8 +47,8 @@ public class Thing extends AEntity {
 	}
 
 	@Override
-	public Map<String, Object> toMap() {
-		final Map<String, Object> map = new HashMap<>();
+	public Map<String, ? extends Object> toMap() {
+		final Map<String, ? super Object> map = new HashMap<>();
 		map.put("id", this.getId());
 		map.put("name", this.getName());
 		map.put("properties", this.getProperties());

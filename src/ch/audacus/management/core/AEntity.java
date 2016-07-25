@@ -4,7 +4,11 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.beanutils.PropertyUtils;
@@ -13,6 +17,7 @@ abstract public class AEntity {
 
 	public String table = this.getClass().getSimpleName().toLowerCase();
 	public String[] primaries = new String[] { "id" };
+	public String[] ignoreOnPersist = new String[] {};
 
 	public AEntity() {}
 
@@ -49,7 +54,18 @@ abstract public class AEntity {
 
 	abstract public <T extends AEntity> T fromResultSet(ResultSet result);
 
-	abstract public Map<String, Object> toMap();
+	abstract public Map<String, ? extends Object> toMap();
+
+	public Map<String, ? extends Object> toPersistMap() {
+		final Map<String, ? extends Object> map = this.toMap();
+		Arrays.stream(this.ignoreOnPersist).forEach(field -> {
+			System.out.println("field: " + field);
+			if (map.get(field) != null) {
+				map.remove(field);
+			}
+		});
+		return map;
+	}
 
 	public Object get(final String name) {
 		Object value = null;
@@ -86,6 +102,8 @@ abstract public class AEntity {
 
 	@Override
 	public String toString() {
-		return String.valueOf(this.get("id"));
+		final List<String> values = new ArrayList<>();
+		Arrays.stream(this.primaries).forEach(primary -> values.add(String.valueOf(this.get(primary))));
+		return values.stream().collect(Collectors.joining("|"));
 	}
 }

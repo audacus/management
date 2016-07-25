@@ -49,8 +49,8 @@ public class Property extends AEntity {
 	}
 
 	@Override
-	public Map<String, Object> toMap() {
-		final Map<String, Object> map = new HashMap<>();
+	public Map<String, ? extends Object> toMap() {
+		final Map<String, ? super Object> map = new HashMap<>();
 		map.put("id", this.getId());
 		map.put("thing", this.getThing());
 		map.put("type", this.getType());
