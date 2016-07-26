@@ -1,3 +1,7 @@
+-- management
+delete from management;
+delete from sqlite_sequence where name='management';
+insert or ignore into management (name) values ('management');
 -- relation
 delete from relation;
 delete from sqlite_sequence where name='relation';

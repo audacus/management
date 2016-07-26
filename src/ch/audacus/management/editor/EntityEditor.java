@@ -1,7 +1,5 @@
 package ch.audacus.management.editor;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.sql.SQLException;
 import java.text.NumberFormat;
 import java.util.ArrayList;
@@ -24,7 +22,7 @@ import ch.audacus.management.core.Database;
 import ch.audacus.management.core.Property;
 
 // http://docs.oracle.com/javase/tutorial/displayCode.html?code=http://docs.oracle.com/javase/tutorial/uiswing/examples/components/FormattedTextFieldDemoProject/src/components/FormattedTextFieldDemo.java
-public class EntityEditor extends AView implements PropertyChangeListener, IItemView {
+public class EntityEditor extends AView implements IItemView {
 
 	protected AEntity entity;
 	protected IItemView itemView;
@@ -104,7 +102,9 @@ public class EntityEditor extends AView implements PropertyChangeListener, IItem
 						if (value != null) {
 							fieldInt.setValue(new Integer(value.toString()));
 						}
-						fieldInt.addPropertyChangeListener("integer", this);
+						fieldInt.addPropertyChangeListener("integer", e -> {
+							System.out.println("integer changed");
+						});
 						final JLabel labelInt = new JLabel(key);
 						labelInt.setLabelFor(fieldInt);
 						this.add(labelInt);
@@ -121,7 +121,9 @@ public class EntityEditor extends AView implements PropertyChangeListener, IItem
 						if (value != null) {
 							fieldDouble.setValue(new Double(value.toString()));
 						}
-						fieldDouble.addPropertyChangeListener("double", this);
+						fieldDouble.addPropertyChangeListener("double", e -> {
+							System.out.println("double changed");
+						});
 						final JLabel labelDouble = new JLabel(key);
 						labelDouble.setLabelFor(fieldDouble);
 						this.add(labelDouble);
@@ -183,19 +185,5 @@ public class EntityEditor extends AView implements PropertyChangeListener, IItem
 	@Override
 	public void reload() {
 		// reload entity from database
-	}
-
-	@Override
-	public void propertyChange(final PropertyChangeEvent evt) {
-		switch (evt.getPropertyName()) {
-			case "integer":
-				System.out.println("integer changed");
-				break;
-			case "double":
-				System.out.println("double changed");
-				break;
-			default:
-				// do nothing
-		}
 	}
 }
