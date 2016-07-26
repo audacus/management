@@ -62,7 +62,7 @@ public class ItemList extends JPanel implements IItemView {
 			});
 			this.buttons.add(buttonItem);
 		});
-		// "new" button
+		// new button
 		final JButton buttonNew = new JButton("+ new " + this.entity.getClass().getSimpleName());
 		buttonNew.addActionListener(e -> {
 			this.editor.setView(new EntityEditor(editor, this.entity, this));

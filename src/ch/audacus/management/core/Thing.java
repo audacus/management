@@ -11,8 +11,6 @@ public class Thing extends AEntity {
 
 	private int id;
 	private String name;
-	// TODO: does not yet work -> takes only ignoreOnPersist from AEntity ?!?!
-	public String[] ignoreOnPersist = new String[] { "properties" };
 
 	public Thing() {
 		super();
@@ -55,6 +53,14 @@ public class Thing extends AEntity {
 		return map;
 	}
 
+	@Override
+	public Map<String, ? extends Object> toPersistMap() {
+		final Map<String, ? super Object> map = new HashMap<>();
+		map.put("id", this.getId());
+		map.put("name", this.getName());
+		return map;
+	}
+
 	public int getId() {
 		return this.id;
 	}
@@ -75,7 +81,7 @@ public class Thing extends AEntity {
 	public List<Property> getProperties() {
 		final List<Property> properties = new ArrayList<>();
 		final List<Field<?>> fields = new ArrayList<>();
-		fields.add(new Field<Thing>("thing", this));
+		fields.add(new Field<>("thing", this));
 		try {
 			final ResultSet result = Database.getByFields(new Property(), fields);
 			while (result.next()) {

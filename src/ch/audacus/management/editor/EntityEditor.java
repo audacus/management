@@ -47,13 +47,14 @@ public class EntityEditor extends AView implements PropertyChangeListener, IItem
 
 		this.addFields(this.entity.toMap());
 
-		// cancel and save buttons
+		// cancel
 		final JButton cancel = new JButton("cancel");
 		cancel.addActionListener(e -> {
 			this.editor.back();
 		});
-
+		// save
 		final JButton save = new JButton("save");
+		System.out.println("save listener for " + this.entity.getClass().getSimpleName());
 		save.addActionListener(e -> {
 			this.fields.forEach((key, value) -> {
 				switch (value.getClass().getSimpleName()) {
@@ -64,18 +65,18 @@ public class EntityEditor extends AView implements PropertyChangeListener, IItem
 					default:
 						// do nothing
 				}
-				try {
-					Database.persist(this.entity);
-					this.itemView.reload();
-					this.editor.back();
-				} catch (final SQLException ex) {
-					if (ex.getMessage().startsWith("[SQLITE_BUSY]")) {
-						this.editor.showMessage(EMessage.DATABASE_LOCKED);
-					} else {
-						ex.printStackTrace();
-					}
-				}
 			});
+			try {
+				Database.persist(this.entity);
+				this.itemView.reload();
+				this.editor.back();
+			} catch (final SQLException ex) {
+				if (ex.getMessage().startsWith("[SQLITE_BUSY]")) {
+					this.editor.showMessage(EMessage.DATABASE_LOCKED);
+				} else {
+					ex.printStackTrace();
+				}
+			}
 		});
 		this.add(cancel);
 		this.add(save);
@@ -95,7 +96,6 @@ public class EntityEditor extends AView implements PropertyChangeListener, IItem
 				} else {
 					clazz = key.getClass();
 				}
-				System.out.println("property: " + key + " -> " + clazz.getName());
 				switch (clazz.getSimpleName()) {
 					case "int":
 					case "Integer":

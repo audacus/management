@@ -56,6 +56,11 @@ public class Value<V> extends AEntity {
 		return map;
 	}
 
+	@Override
+	public Map<String, ? extends Object> toPersistMap() {
+		return this.toMap();
+	}
+
 	public int getId() {
 		return this.id;
 	}

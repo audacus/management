@@ -17,7 +17,6 @@ abstract public class AEntity {
 
 	public String table = this.getClass().getSimpleName().toLowerCase();
 	public String[] primaries = new String[] { "id" };
-	public String[] ignoreOnPersist = new String[] {};
 
 	public AEntity() {}
 
@@ -56,16 +55,7 @@ abstract public class AEntity {
 
 	abstract public Map<String, ? extends Object> toMap();
 
-	public Map<String, ? extends Object> toPersistMap() {
-		final Map<String, ? extends Object> map = this.toMap();
-		Arrays.stream(this.ignoreOnPersist).forEach(field -> {
-			System.out.println("field: " + field);
-			if (map.get(field) != null) {
-				map.remove(field);
-			}
-		});
-		return map;
-	}
+	abstract public Map<String, ? extends Object> toPersistMap();
 
 	public Object get(final String name) {
 		Object value = null;
