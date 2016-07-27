@@ -84,16 +84,14 @@ public class EntityEditor extends AView implements IItemView {
 
 	private void addFields(final Map<String, ? extends Object> map) {
 		System.out.println("open: " + map);
+		// add fields based on the entity map
 		for (final Entry<String, ? extends Object> entry : map.entrySet()) {
 			final String key = entry.getKey();
 			final Object value = entry.getValue();
-			if (Arrays.stream(this.entity.primaries).anyMatch(p -> p != key)) {
-				Class<?> clazz = null;
-				if (key != null) {
-					clazz = this.entity.getPropertyType(key);
-				} else {
-					clazz = key.getClass();
-				}
+			// if field is not primary and key is not null
+			if (Arrays.stream(this.entity.primaries).anyMatch(p -> p != key) && key != null) {
+				// get type of field
+				final Class<?> clazz = this.entity.getPropertyType(key);
 				switch (clazz.getSimpleName()) {
 					case "int":
 					case "Integer":

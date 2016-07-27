@@ -26,7 +26,7 @@ public class Value<V> extends AEntity {
 
 	@Override
 	public Value fromId(final int id) {
-		final Value value = new Value();
+		final Value<Object> value = new Value<>();
 		try {
 			final ResultSet result = Database.getByPrimary(this, id);
 			if (result.next()) {

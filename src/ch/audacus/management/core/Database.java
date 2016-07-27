@@ -75,7 +75,7 @@ public class Database {
 		return Database.connection;
 	}
 
-	public static ResultSet getByPrimary(final Class<? extends AEntity> clazz, final int... primaries) throws SQLException {
+	public static ResultSet getByPrimary(final Class<? extends AEntity> clazz, final Integer... primaries) throws SQLException {
 		ResultSet result = null;
 		try {
 			result = Database.getByPrimary(clazz.newInstance(), primaries);
@@ -85,11 +85,11 @@ public class Database {
 		return result;
 	}
 
-	public static ResultSet getByPrimary(final AEntity entity, final int... primaries) throws SQLException {
+	public static ResultSet getByPrimary(final AEntity entity, final Integer... primaries) throws SQLException {
 		final List<Field<?>> list = new ArrayList<>();
 		for (int i = 0; i < primaries.length; i++) {
 			if (entity.primaries.length > i) {
-				list.add(new Field<Integer>(entity.primaries[i], new Integer(primaries[i])));
+				list.add(new Field<>(entity.primaries[i], primaries[i]));
 			}
 		}
 		return Database.getByFields(entity, list);
@@ -179,29 +179,39 @@ public class Database {
 	public static ResultSet persist(final AEntity entity) throws SQLException {
 		final Map<String, ? extends Object> map = entity.toPersistMap();
 		System.out.println("persist: " + map);
-		final List<Object> values = new ArrayList<Object>(map.values());
+		final List<Object> values = new ArrayList<>(map.values());
 		PreparedStatement statement = null;
 		// set up insert string with table and fields
-		final StringBuilder sql = new StringBuilder(String.format(Database.INSERT, new Object[] { entity.table, map.keySet().stream().collect(Collectors.joining(", ")), map.values().stream().map(e -> {
-			return "?";
-		}).collect(Collectors.joining(", ")) }));
+		final StringBuilder sql = new StringBuilder(String.format(Database.INSERT,
+				new Object[] {
+						entity.table,
+						map.keySet().stream().collect(Collectors.joining(", ")),
+						map.values().stream().map(e -> { return "?"; }).collect(Collectors.joining(", ")) }));
 
 		// add values
 		statement = Database.get().prepareStatement(sql.toString());
 		statement.closeOnCompletion();
+
+		// do not allow insert of primary with value 0
 		for (int i = 1; i <= values.size(); i++) {
 			Object value = values.get(i - 1);
-			// do not allow insert of id 0
-			if (value instanceof Integer && value.equals(new Integer(0))) {
+			final String field = map.keySet().toArray(new String[0])[i - 1];
+			if (value instanceof Integer
+					&& value.equals(new Integer(0))
+					&& Arrays.stream(entity.primaries).collect(Collectors.toList()).contains(field)) {
 				value = null;
 			}
 			statement.setObject(i, value);
 		}
 		// execute insert
 		statement.executeUpdate();
+		// get inserted keys
 		final ResultSet keys = statement.getGeneratedKeys();
-		// get inserted
-		final ResultSet inserted = Database.getByPrimary(entity, keys.getInt(keys.getMetaData().getColumnLabel(1)));
+		final List<Integer> generated = new ArrayList<>();
+		while (keys.next()) {
+			generated.add(keys.getInt(keys.getMetaData().getColumnLabel(1)));
+		}
+		final ResultSet inserted = Database.getByPrimary(entity, generated.stream().toArray(Integer[]::new));
 		if (inserted.next()) {
 			// TODO 2016-02-09: log
 		}
@@ -240,7 +250,13 @@ public class Database {
 			}
 		}
 
-		Arrays.stream(files.listFiles((FilenameFilter) (dir, name) -> name.startsWith(type + Database.NAME_SEPARATOR + Database.DATABASE_NAME) && name.endsWith("." + Database.SQL))).forEach(file -> Database.executeSql(file));
+		Arrays.stream(files
+				.listFiles(
+						(FilenameFilter) (dir, name) ->
+						// condition
+						name.startsWith(type + Database.NAME_SEPARATOR + Database.DATABASE_NAME)
+						&& name.endsWith("." + Database.SQL)))
+		.forEach(file -> Database.executeSql(file));
 	}
 
 	private static void executeSql(final File sql) {
