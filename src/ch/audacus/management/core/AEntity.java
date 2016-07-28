@@ -49,6 +49,8 @@ abstract public class AEntity {
 		}
 	}
 
+	abstract public String getName();
+
 	abstract public <T extends AEntity> T fromId(final int id);
 
 	abstract public <T extends AEntity> T fromResultSet(ResultSet result);
@@ -56,6 +58,7 @@ abstract public class AEntity {
 	abstract public Map<String, ? extends Object> toMap();
 
 	abstract public Map<String, ? extends Object> toPersistMap();
+
 
 	public Object get(final String name) {
 		Object value = null;

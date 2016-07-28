@@ -25,6 +25,7 @@ public class Property extends AEntity {
 		super(result);
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public Property fromId(final int id) {
 		final Property property = new Property();
@@ -43,6 +44,7 @@ public class Property extends AEntity {
 		return property;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public Property fromResultSet(final ResultSet result) {
 		return new Property(result);
@@ -120,6 +122,7 @@ public class Property extends AEntity {
 		this.relation = relation;
 	}
 
+	@Override
 	public String getName() {
 		return this.name;
 	}

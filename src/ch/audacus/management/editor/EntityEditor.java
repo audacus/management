@@ -20,8 +20,10 @@ import javax.swing.SpringLayout;
 import ch.audacus.management.core.AEntity;
 import ch.audacus.management.core.Database;
 import ch.audacus.management.core.Property;
+import ch.audacus.management.core.Thing;
 
 // http://docs.oracle.com/javase/tutorial/displayCode.html?code=http://docs.oracle.com/javase/tutorial/uiswing/examples/components/FormattedTextFieldDemoProject/src/components/FormattedTextFieldDemo.java
+@SuppressWarnings("serial")
 public class EntityEditor extends AView implements IItemView {
 
 	protected AEntity entity;
@@ -38,13 +40,12 @@ public class EntityEditor extends AView implements IItemView {
 	}
 
 	// TODO: NumberFormat integer, double, string
-	// TODO: [ ] Instance, [ ]Management, [ ] Property, [ ] Relation, [ ] Thing,
+	// TODO: [ ] Instance, [ ] Management, [x] Property, [ ] Relation, [x] Thing,
 	// [ ] Value
 	private void initEditor() {
 		this.setLayout(new SpringLayout());
-
+		// fields
 		this.addFields(this.entity.toMap());
-
 		// cancel
 		final JButton cancel = new JButton("cancel");
 		cancel.addActionListener(e -> {
@@ -52,7 +53,6 @@ public class EntityEditor extends AView implements IItemView {
 		});
 		// save
 		final JButton save = new JButton("save");
-		System.out.println("save listener for " + this.entity.getClass().getSimpleName());
 		save.addActionListener(e -> {
 			this.fields.forEach((key, value) -> {
 				switch (value.getClass().getSimpleName()) {
@@ -95,72 +95,25 @@ public class EntityEditor extends AView implements IItemView {
 				switch (clazz.getSimpleName()) {
 					case "int":
 					case "Integer":
-						final JFormattedTextField fieldInt = new JFormattedTextField(NumberFormat.getIntegerInstance());
-						fieldInt.setName(key);
-						if (value != null) {
-							fieldInt.setValue(new Integer(value.toString()));
-						}
-						fieldInt.addPropertyChangeListener("integer", e -> {
-							System.out.println("integer changed");
-						});
-						final JLabel labelInt = new JLabel(key);
-						labelInt.setLabelFor(fieldInt);
-						this.add(labelInt);
-						this.add(fieldInt);
-						this.fieldsInt.add(fieldInt);
-						this.fields.put(key, fieldInt);
+						this.addIntegerField(key, value);
 						break;
 					case "float":
 					case "Float":
 					case "double":
 					case "Double":
-						final JFormattedTextField fieldDouble = new JFormattedTextField(NumberFormat.getNumberInstance());
-						fieldDouble.setName(key);
-						if (value != null) {
-							fieldDouble.setValue(new Double(value.toString()));
-						}
-						fieldDouble.addPropertyChangeListener("double", e -> {
-							System.out.println("double changed");
-						});
-						final JLabel labelDouble = new JLabel(key);
-						labelDouble.setLabelFor(fieldDouble);
-						this.add(labelDouble);
-						this.add(fieldDouble);
-						this.fieldsDouble.add(fieldDouble);
-						this.fields.put(key, fieldDouble);
+						this.addDoubleField(key, value);
 						break;
 					case "String":
-						final JTextField fieldString = new JTextField();
-						fieldString.setName(key);
-						if (value != null) {
-							fieldString.setText(value.toString());
-						}
-						final JLabel labelString = new JLabel(key);
-						labelString.setLabelFor(fieldString);
-						this.add(labelString);
-						this.add(fieldString);
-						this.fields.put(key, fieldString);
+						this.addStringField(key, value);
 						break;
-						// properties
 					case "List":
-						if (value != null) {
-							final List<Property> list = (List<Property>) value;
-							list.forEach(property -> {
-								final String name = property.getName();
-								final JButton btnProperty = new JButton(property.getType().getName());
-								btnProperty.setName(name);
-								btnProperty.addActionListener(e -> {
-									this.editor.setView(new EntityEditor(this.editor, property, this.itemView));
-								});
-								final JLabel labelProperty = new JLabel(name);
-								labelProperty.setLabelFor(btnProperty);
-								this.add(labelProperty);
-								this.add(btnProperty);
-								this.fields.put(name, btnProperty);
-							});
+						if (key.equals("properties")) {
+							// properties
+							this.addPropertyFields(value);
 						}
 						break;
 					case "Thing":
+						this.addThingField(key, value);
 						break;
 					case "Relation":
 						break;
@@ -183,5 +136,88 @@ public class EntityEditor extends AView implements IItemView {
 	@Override
 	public void reload() {
 		// reload entity from database
+	}
+
+	private void addIntegerField(final String name, final Object value) {
+		final JFormattedTextField fieldInt = new JFormattedTextField(NumberFormat.getIntegerInstance());
+		fieldInt.setName(name);
+		if (value != null) {
+			fieldInt.setValue(new Integer(value.toString()));
+		}
+		fieldInt.addPropertyChangeListener("integer", e -> {
+			System.out.println("integer changed");
+		});
+		final JLabel labelInt = new JLabel(name);
+		labelInt.setLabelFor(fieldInt);
+		this.add(labelInt);
+		this.add(fieldInt);
+		this.fieldsInt.add(fieldInt);
+		this.fields.put(name, fieldInt);
+	}
+
+	private void addDoubleField(final String name, final Object value) {
+		final JFormattedTextField fieldDouble = new JFormattedTextField(NumberFormat.getNumberInstance());
+		fieldDouble.setName(name);
+		if (value != null) {
+			fieldDouble.setValue(new Double(value.toString()));
+		}
+		fieldDouble.addPropertyChangeListener("double", e -> {
+			System.out.println("double changed");
+		});
+		final JLabel labelDouble = new JLabel(name);
+		labelDouble.setLabelFor(fieldDouble);
+		this.add(labelDouble);
+		this.add(fieldDouble);
+		this.fieldsDouble.add(fieldDouble);
+		this.fields.put(name, fieldDouble);
+	}
+
+	private void addStringField(final String name, final Object value) {
+		final JTextField fieldString = new JTextField();
+		fieldString.setName(name);
+		if (value != null) {
+			fieldString.setText(value.toString());
+		}
+		final JLabel labelString = new JLabel(name);
+		labelString.setLabelFor(fieldString);
+		this.add(labelString);
+		this.add(fieldString);
+		this.fields.put(name, fieldString);
+	}
+
+	private void addPropertyFields(final Object value) {
+		if (value != null && value instanceof List) {
+			@SuppressWarnings("unchecked")
+			final List<Property> list = (List<Property>) value;
+			list.forEach(property -> {
+				final String name = property.getName();
+				final JButton btnProperty = new JButton(property.getRelation().getName() + " " + property.getType().getName());
+				btnProperty.setName(name);
+				btnProperty.addActionListener(e -> {
+					this.editor.setView(new EntityEditor(this.editor, property, this.itemView));
+				});
+				final JLabel labelProperty = new JLabel(name);
+				labelProperty.setLabelFor(btnProperty);
+				this.add(labelProperty);
+				this.add(btnProperty);
+				this.fields.put(name, btnProperty);
+			});
+		}
+	}
+
+	private void addThingField(final String name, final Object value) {
+		if (!name.equals("thing")) {
+			final Thing thing = (Thing) value;
+			final JButton btnThing = new JButton(thing.getName());
+			btnThing.setName(name);
+			btnThing.addActionListener(e -> {
+				this.editor.setView(new EntityEditor(this.editor, thing, this.itemView));
+			});
+			final JLabel labelThing = new JLabel(name);
+			labelThing.setLabelFor(btnThing);
+			this.add(labelThing);
+			this.add(btnThing);
+			this.fields.put(name, btnThing);
+		}
 	}
 }

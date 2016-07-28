@@ -22,6 +22,7 @@ public class Management extends AEntity {
 		super(result);
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public Management fromId(final int id) {
 		final Management management = new Management();
@@ -37,6 +38,7 @@ public class Management extends AEntity {
 		return management;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public Management fromResultSet(final ResultSet result) {
 		return new Management(result);
@@ -63,6 +65,7 @@ public class Management extends AEntity {
 		this.id = id;
 	}
 
+	@Override
 	public String getName() {
 		return this.name;
 	}

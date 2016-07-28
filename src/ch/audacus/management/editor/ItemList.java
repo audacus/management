@@ -1,17 +1,21 @@
 package ch.audacus.management.editor;
 
-import java.awt.Component;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.swing.BoxLayout;
 import javax.swing.JButton;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.SwingConstants;
+import javax.swing.border.EmptyBorder;
 
 import ch.audacus.management.core.AEntity;
 import ch.audacus.management.core.Database;
 
+@SuppressWarnings("serial")
 public class ItemList extends JPanel implements IItemView {
 
 	protected Editor editor;
@@ -50,9 +54,17 @@ public class ItemList extends JPanel implements IItemView {
 	private void initList(final Editor editor) {
 		this.removeAll();
 		this.editor = editor;
-		this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+		this.setBorder(new EmptyBorder(5, 5, 5, 5));
+		this.setLayout(new GridBagLayout());
+		// constraints
+		final GridBagConstraints constraints = new GridBagConstraints();
+		constraints.gridx = 0;
+		constraints.fill = GridBagConstraints.HORIZONTAL;
+		// buttons
 		this.buttons = new ArrayList<>();
-
+		// title
+		final JLabel title = new JLabel(this.entity.getClass().getSimpleName() + "s", SwingConstants.HORIZONTAL);
+		this.add(title, constraints);
 		// item buttons
 		this.items.forEach(item -> {
 			System.out.println("item: " + item.toMap());
@@ -71,9 +83,7 @@ public class ItemList extends JPanel implements IItemView {
 
 		// do for all buttons
 		for (final JButton button : this.buttons) {
-			button.setAlignmentX(Component.CENTER_ALIGNMENT);
-			button.setSize(button.getMaximumSize());
-			this.add(button);
+			this.add(button, constraints);
 		}
 	}
 

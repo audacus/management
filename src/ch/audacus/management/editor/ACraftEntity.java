@@ -1,12 +1,14 @@
 package ch.audacus.management.editor;
 
-import java.awt.Component;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 
-import javax.swing.BoxLayout;
 import javax.swing.JButton;
+import javax.swing.border.EmptyBorder;
 
 import ch.audacus.management.core.AEntity;
 
+@SuppressWarnings("serial")
 public abstract class ACraftEntity extends AView {
 
 	protected AEntity entity;
@@ -28,15 +30,19 @@ public abstract class ACraftEntity extends AView {
 	}
 
 	private void initPanel() {
-		this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+		this.setBorder(new EmptyBorder(5, 5, 5, 5));
+		this.setLayout(new GridBagLayout());
+		// constraints
+		final GridBagConstraints constraints = new GridBagConstraints();
+		constraints.gridx = 0;
+		constraints.fill = GridBagConstraints.HORIZONTAL;
 		// items
-		this.add(new ItemList(this.editor, this.entity));
+		this.add(new ItemList(this.editor, this.entity), constraints);
 		// back
 		final JButton btnBack = new JButton("back..");
-		btnBack.setAlignmentX(Component.CENTER_ALIGNMENT);
 		btnBack.addActionListener(e -> {
 			this.editor.back();
 		});
-		this.add(btnBack);
+		this.add(btnBack, constraints);
 	}
 }

@@ -1,35 +1,44 @@
 package ch.audacus.management.editor;
 
-import java.awt.Component;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 
-import javax.swing.BoxLayout;
 import javax.swing.JButton;
+import javax.swing.JLabel;
+import javax.swing.SwingConstants;
+import javax.swing.border.EmptyBorder;
 
+@SuppressWarnings("serial")
 public class Craft extends AView {
 
 	public Craft(final Editor editor) {
 		super(editor);
-		this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+		this.setBorder(new EmptyBorder(5, 5, 5, 5));
+		this.setLayout(new GridBagLayout());
+		// constraints
+		final GridBagConstraints constraints = new GridBagConstraints();
+		constraints.gridx = 0;
+		constraints.fill = GridBagConstraints.HORIZONTAL;
+		// title
+		final JLabel title = new JLabel("Craft", SwingConstants.HORIZONTAL);
+		this.add(title, constraints);
 		// management
 		final JButton btnManagement = new JButton("management");
-		btnManagement.setAlignmentX(Component.CENTER_ALIGNMENT);
 		btnManagement.addActionListener(e -> {
 			this.editor.setView(EView.CRAFT_MANAGEMENT);
 		});
-		this.add(btnManagement);
+		this.add(btnManagement, constraints);
 		// thing
 		final JButton btnThing = new JButton("thing");
-		btnThing.setAlignmentX(Component.CENTER_ALIGNMENT);
 		btnThing.addActionListener(e -> {
 			this.editor.setView(EView.CRAFT_THING);
 		});
-		this.add(btnThing);
+		this.add(btnThing, constraints);
 		// back
 		final JButton btnBack = new JButton("back..");
-		btnBack.setAlignmentX(Component.CENTER_ALIGNMENT);
 		btnBack.addActionListener(e -> {
 			this.editor.back();
 		});
-		this.add(btnBack);
+		this.add(btnBack, constraints);
 	}
 }

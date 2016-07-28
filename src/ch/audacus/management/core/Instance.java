@@ -23,6 +23,7 @@ public class Instance extends AEntity {
 		super(result);
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public Instance fromId(final int id) {
 		final Instance instance = new Instance();
@@ -39,6 +40,7 @@ public class Instance extends AEntity {
 		return instance;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public Instance fromResultSet(final ResultSet result) {
 		return new Instance(result);
@@ -56,6 +58,11 @@ public class Instance extends AEntity {
 	@Override
 	public Map<String, ? extends Object> toPersistMap() {
 		return this.toMap();
+	}
+
+	@Override
+	public String getName() {
+		return this.thing.getName()+"@"+this.management.getName();
 	}
 
 	public int getId() {

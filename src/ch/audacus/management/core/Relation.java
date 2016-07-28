@@ -22,6 +22,7 @@ public class Relation extends AEntity {
 		super(result);
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public Relation fromId(final int id) {
 		final Relation relation = new Relation();
@@ -37,6 +38,7 @@ public class Relation extends AEntity {
 		return relation;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public Relation fromResultSet(final ResultSet result) {
 		return new Relation(result);
@@ -63,6 +65,7 @@ public class Relation extends AEntity {
 		this.id = id;
 	}
 
+	@Override
 	public String getName() {
 		return this.name;
 	}

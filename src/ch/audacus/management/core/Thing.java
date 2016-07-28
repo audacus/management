@@ -24,6 +24,7 @@ public class Thing extends AEntity {
 		super(result);
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public Thing fromId(final int id) {
 		final Thing thing = new Thing();
@@ -39,6 +40,7 @@ public class Thing extends AEntity {
 		return thing;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public Thing fromResultSet(final ResultSet result) {
 		return new Thing(result);
@@ -69,6 +71,7 @@ public class Thing extends AEntity {
 		this.id = id;
 	}
 
+	@Override
 	public String getName() {
 		return this.name;
 	}

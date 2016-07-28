@@ -24,8 +24,9 @@ public class Value<V> extends AEntity {
 		super(result);
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
-	public Value fromId(final int id) {
+	public Value<?> fromId(final int id) {
 		final Value<Object> value = new Value<>();
 		try {
 			final ResultSet result = Database.getByPrimary(this, id);
@@ -41,9 +42,10 @@ public class Value<V> extends AEntity {
 		return value;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
-	public Value fromResultSet(final ResultSet result) {
-		return new Value(result);
+	public Value<?> fromResultSet(final ResultSet result) {
+		return new Value<>(result);
 	}
 
 	@Override
@@ -59,6 +61,11 @@ public class Value<V> extends AEntity {
 	@Override
 	public Map<String, ? extends Object> toPersistMap() {
 		return this.toMap();
+	}
+
+	@Override
+	public String getName() {
+		return this.property.getThing().getName() + "::" + this.property.getName();
 	}
 
 	public int getId() {

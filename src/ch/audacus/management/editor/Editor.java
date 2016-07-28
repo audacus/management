@@ -2,6 +2,7 @@ package ch.audacus.management.editor;
 
 import java.awt.EventQueue;
 import java.util.LinkedList;
+import java.util.stream.Collectors;
 
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
@@ -9,6 +10,7 @@ import javax.swing.JPanel;
 
 import ch.audacus.management.core.Database;
 
+@SuppressWarnings("serial")
 public class Editor extends JFrame {
 
 	protected LinkedList<JPanel> history = new LinkedList<>();
@@ -64,7 +66,8 @@ public class Editor extends JFrame {
 		this.setContentPane(view);
 		this.pack();
 		this.setLocationRelativeTo(null);
-		System.out.println("view: " + view.getClass().getSimpleName());
+		//		System.out.println("view: " + view.getClass().getSimpleName());
+		System.out.println("view: " + this.history.stream().map(e -> e.getClass().getSimpleName()).collect(Collectors.joining(" > ")));
 	}
 
 	public void back() {
