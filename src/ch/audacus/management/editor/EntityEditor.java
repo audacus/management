@@ -116,6 +116,11 @@ public class EntityEditor extends AView implements IItemView {
 						this.addThingField(key, value);
 						break;
 					case "Relation":
+						// TODO: single multiple
+						break;
+					case "Value":
+						// TODO: single multiple
+						// TODO: set value in <thing> field / <thing> combobox
 						break;
 					default:
 						// do nothing
@@ -124,8 +129,8 @@ public class EntityEditor extends AView implements IItemView {
 		}
 	}
 
-	public JComboBox<? extends AEntity> createCombobox(final AEntity entity) {
-		final JComboBox<? extends AEntity> combo = null;
+	public <T extends AEntity> JComboBox<T> createCombobox(final T entity) {
+		final JComboBox<T> combo combo = new JComboBox<>();
 		// TODO: combobox for editing things
 		// TODO: combobox for selecting values of an instance
 		// TODO: revalidate previous todos -> where do i need entity editor and
