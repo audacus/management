@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.beanutils.PropertyUtils;
 
-abstract public class AEntity {
+public abstract class AEntity {
 
 	public String table = this.getClass().getSimpleName().toLowerCase();
 	public String[] primaries = new String[] { "id" };
@@ -49,15 +49,15 @@ abstract public class AEntity {
 		}
 	}
 
-	abstract public String getName();
+	public abstract String getName();
 
-	abstract public <T extends AEntity> T fromId(final int id);
+	public abstract <T extends AEntity> T fromId(final int id);
 
-	abstract public <T extends AEntity> T fromResultSet(ResultSet result);
+	public abstract <T extends AEntity> T fromResultSet(ResultSet result);
 
-	abstract public Map<String, ? extends Object> toMap();
+	public abstract Map<String, ? extends Object> toMap();
 
-	abstract public Map<String, ? extends Object> toPersistMap();
+	public abstract Map<String, ? extends Object> toPersistMap();
 
 
 	public Object get(final String name) {
