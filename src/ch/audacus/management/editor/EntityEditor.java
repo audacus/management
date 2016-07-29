@@ -1,8 +1,9 @@
 package ch.audacus.management.editor;
 
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.sql.SQLException;
 import java.text.NumberFormat;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -14,8 +15,11 @@ import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SpringLayout;
+import javax.swing.SwingConstants;
+import javax.swing.border.EmptyBorder;
 
 import ch.audacus.management.core.AEntity;
 import ch.audacus.management.core.Database;
@@ -29,8 +33,9 @@ public class EntityEditor extends AView implements IItemView {
 	protected AEntity entity;
 	protected IItemView itemView;
 	protected Map<String, JComponent> fields = new HashMap<>();
-	protected List<JFormattedTextField> fieldsInt = new ArrayList<>();
-	protected List<JFormattedTextField> fieldsDouble = new ArrayList<>();
+	//	protected List<JFormattedTextField> fieldsInt = new ArrayList<>();
+	//	protected List<JFormattedTextField> fieldsDouble = new ArrayList<>();
+	protected JPanel fieldsPanel = new JPanel(new SpringLayout());
 
 	public EntityEditor(final Editor editor, final AEntity entity, final IItemView itemView) {
 		super(editor);
@@ -43,9 +48,18 @@ public class EntityEditor extends AView implements IItemView {
 	// TODO: [ ] Instance, [ ] Management, [x] Property, [ ] Relation, [x] Thing,
 	// [ ] Value
 	private void initEditor() {
-		this.setLayout(new SpringLayout());
+		this.setBorder(new EmptyBorder(5, 5, 5, 5));
+		this.setLayout(new GridBagLayout());
+		// constraints
+		final GridBagConstraints constraints = new GridBagConstraints();
+		constraints.gridx = 0;
+		constraints.fill = GridBagConstraints.HORIZONTAL;
+		// title
+		final JLabel title = new JLabel(this.entity.getName(), SwingConstants.CENTER);
+		this.add(title, constraints);
 		// fields
 		this.addFields(this.entity.toMap());
+		this.add(this.fieldsPanel, constraints);
 		// cancel
 		final JButton cancel = new JButton("cancel");
 		cancel.addActionListener(e -> {
@@ -76,9 +90,8 @@ public class EntityEditor extends AView implements IItemView {
 				}
 			}
 		});
-		this.add(cancel);
-		this.add(save);
-		SpringUtilities.makeCompactGrid(this, this.fields.size() + 1, 2, 6, 6, 6, 6);
+		this.add(cancel, constraints);
+		this.add(save, constraints);
 
 	}
 
@@ -127,10 +140,11 @@ public class EntityEditor extends AView implements IItemView {
 				}
 			}
 		}
+		SpringUtilities.makeCompactGrid(this.fieldsPanel, this.fields.size(), 2, 6, 6, 6, 6);
 	}
 
 	public <T extends AEntity> JComboBox<T> createCombobox(final T entity) {
-		final JComboBox<T> combo combo = new JComboBox<>();
+		final JComboBox<T> combo = new JComboBox<>();
 		// TODO: combobox for editing things
 		// TODO: combobox for selecting values of an instance
 		// TODO: revalidate previous todos -> where do i need entity editor and
@@ -154,9 +168,9 @@ public class EntityEditor extends AView implements IItemView {
 		});
 		final JLabel labelInt = new JLabel(name);
 		labelInt.setLabelFor(fieldInt);
-		this.add(labelInt);
-		this.add(fieldInt);
-		this.fieldsInt.add(fieldInt);
+		this.fieldsPanel.add(labelInt);
+		this.fieldsPanel.add(fieldInt);
+		//		this.fieldsInt.add(fieldInt);
 		this.fields.put(name, fieldInt);
 	}
 
@@ -171,9 +185,9 @@ public class EntityEditor extends AView implements IItemView {
 		});
 		final JLabel labelDouble = new JLabel(name);
 		labelDouble.setLabelFor(fieldDouble);
-		this.add(labelDouble);
-		this.add(fieldDouble);
-		this.fieldsDouble.add(fieldDouble);
+		this.fieldsPanel.add(labelDouble);
+		this.fieldsPanel.add(fieldDouble);
+		//		this.fieldsDouble.add(fieldDouble);
 		this.fields.put(name, fieldDouble);
 	}
 
@@ -185,8 +199,8 @@ public class EntityEditor extends AView implements IItemView {
 		}
 		final JLabel labelString = new JLabel(name);
 		labelString.setLabelFor(fieldString);
-		this.add(labelString);
-		this.add(fieldString);
+		this.fieldsPanel.add(labelString);
+		this.fieldsPanel.add(fieldString);
 		this.fields.put(name, fieldString);
 	}
 
@@ -203,8 +217,8 @@ public class EntityEditor extends AView implements IItemView {
 				});
 				final JLabel labelProperty = new JLabel(name);
 				labelProperty.setLabelFor(btnProperty);
-				this.add(labelProperty);
-				this.add(btnProperty);
+				this.fieldsPanel.add(labelProperty);
+				this.fieldsPanel.add(btnProperty);
 				this.fields.put(name, btnProperty);
 			});
 		}
@@ -220,8 +234,8 @@ public class EntityEditor extends AView implements IItemView {
 			});
 			final JLabel labelThing = new JLabel(name);
 			labelThing.setLabelFor(btnThing);
-			this.add(labelThing);
-			this.add(btnThing);
+			this.fieldsPanel.add(labelThing);
+			this.fieldsPanel.add(btnThing);
 			this.fields.put(name, btnThing);
 		}
 	}
