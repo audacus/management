@@ -30,7 +30,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */ 
 
-package ch.audacus.management.editor;
+package ch.audacus.management.gui;
 
 import java.awt.Component;
 import java.awt.Container;

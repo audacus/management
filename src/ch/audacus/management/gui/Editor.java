@@ -1,4 +1,4 @@
-package ch.audacus.management.editor;
+package ch.audacus.management.gui;
 
 import java.awt.EventQueue;
 import java.util.LinkedList;

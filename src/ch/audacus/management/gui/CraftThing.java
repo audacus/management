@@ -1,4 +1,4 @@
-package ch.audacus.management.editor;
+package ch.audacus.management.gui;
 
 import ch.audacus.management.core.Thing;
 
