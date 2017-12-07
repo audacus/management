@@ -78,4 +78,8 @@ public class Editor extends JFrame {
 	public void showMessage(final EMessage message) {
 		JOptionPane.showMessageDialog(this, message);
 	}
+	
+	public AView replaceView(final AView toBeReplaced, final AView newView) {
+		return (AView) this.history.set(this.history.lastIndexOf(toBeReplaced), newView);
+	}
 }
