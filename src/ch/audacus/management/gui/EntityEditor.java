@@ -28,13 +28,14 @@ import ch.audacus.management.core.Thing;
 
 // http://docs.oracle.com/javase/tutorial/displayCode.html?code=http://docs.oracle.com/javase/tutorial/uiswing/examples/components/FormattedTextFieldDemoProject/src/components/FormattedTextFieldDemo.java
 @SuppressWarnings("serial")
-public class EntityEditor extends AView implements IItemView {
+public class EntityEditor extends AView {
 
 	protected AEntity entity;
 	protected IItemView itemView;
+	protected EntityEditor parent = null;
 	protected Map<String, JComponent> fields = new HashMap<>();
-	//	protected List<JFormattedTextField> fieldsInt = new ArrayList<>();
-	//	protected List<JFormattedTextField> fieldsDouble = new ArrayList<>();
+	// protected List<JFormattedTextField> fieldsInt = new ArrayList<>();
+	// protected List<JFormattedTextField> fieldsDouble = new ArrayList<>();
 	protected JPanel fieldsPanel = new JPanel(new SpringLayout());
 
 	public EntityEditor(final Editor editor, final AEntity entity, final IItemView itemView) {
@@ -42,6 +43,14 @@ public class EntityEditor extends AView implements IItemView {
 		this.entity = entity;
 		this.itemView = itemView;
 		this.initEditor();
+	}
+
+	public EntityEditor(final Editor editor, final AEntity entity, final IItemView itemView, final EntityEditor parent) {
+		super(editor);
+		this.entity = entity;
+		this.itemView = itemView;
+		this.initEditor();
+		this.parent = parent;
 	}
 
 	// TODO: NumberFormat integer, double, string
@@ -60,6 +69,11 @@ public class EntityEditor extends AView implements IItemView {
 		// fields
 		this.addFields(this.entity.toMap());
 		this.add(this.fieldsPanel, constraints);
+		// + property
+		final JButton addProperty = new JButton("+ property");
+		addProperty.addActionListener(e -> {
+			this.editor.setView(new CraftProperty(this.editor));
+		});
 		// cancel
 		final JButton cancel = new JButton("cancel");
 		cancel.addActionListener(e -> {
@@ -80,8 +94,13 @@ public class EntityEditor extends AView implements IItemView {
 			});
 			try {
 				Database.persist(this.entity);
+				// reload item list
 				this.itemView.reload();
-				this.editor.back();
+				this.reload();
+				// replace parent with a new instance of parent
+				if (this.parent != null) {
+					this.editor.replaceView(this.parent, this.parent.getNewInstance());
+				}
 			} catch (final SQLException ex) {
 				if (ex.getMessage().startsWith("[SQLITE_BUSY]")) {
 					this.editor.showMessage(EMessage.DATABASE_LOCKED);
@@ -90,9 +109,9 @@ public class EntityEditor extends AView implements IItemView {
 				}
 			}
 		});
+		this.add(addProperty, constraints);
 		this.add(cancel, constraints);
 		this.add(save, constraints);
-
 	}
 
 	private void addFields(final Map<String, ? extends Object> map) {
@@ -143,6 +162,11 @@ public class EntityEditor extends AView implements IItemView {
 		SpringUtilities.makeCompactGrid(this.fieldsPanel, this.fields.size(), 2, 6, 6, 6, 6);
 	}
 
+	private void reload() {
+		this.editor.back();
+		this.editor.setView(this.getNewInstance());
+	}
+
 	public <T extends AEntity> JComboBox<T> createCombobox(final T entity) {
 		final JComboBox<T> combo = new JComboBox<>();
 		// TODO: combobox for editing things
@@ -152,16 +176,11 @@ public class EntityEditor extends AView implements IItemView {
 		return combo;
 	}
 
-	@Override
-	public void reload() {
-		// reload entity from database
-	}
-
 	private void addIntegerField(final String name, final Object value) {
 		final JFormattedTextField fieldInt = new JFormattedTextField(NumberFormat.getIntegerInstance());
 		fieldInt.setName(name);
 		if (value != null) {
-			fieldInt.setValue(new Integer(value.toString()));
+			fieldInt.setValue(Integer.parseInt(value.toString()));
 		}
 		fieldInt.addPropertyChangeListener("integer", e -> {
 			System.out.println("integer changed");
@@ -170,7 +189,7 @@ public class EntityEditor extends AView implements IItemView {
 		labelInt.setLabelFor(fieldInt);
 		this.fieldsPanel.add(labelInt);
 		this.fieldsPanel.add(fieldInt);
-		//		this.fieldsInt.add(fieldInt);
+		// this.fieldsInt.add(fieldInt);
 		this.fields.put(name, fieldInt);
 	}
 
@@ -178,7 +197,7 @@ public class EntityEditor extends AView implements IItemView {
 		final JFormattedTextField fieldDouble = new JFormattedTextField(NumberFormat.getNumberInstance());
 		fieldDouble.setName(name);
 		if (value != null) {
-			fieldDouble.setValue(new Double(value.toString()));
+			fieldDouble.setValue(Double.parseDouble(value.toString()));
 		}
 		fieldDouble.addPropertyChangeListener("double", e -> {
 			System.out.println("double changed");
@@ -187,7 +206,7 @@ public class EntityEditor extends AView implements IItemView {
 		labelDouble.setLabelFor(fieldDouble);
 		this.fieldsPanel.add(labelDouble);
 		this.fieldsPanel.add(fieldDouble);
-		//		this.fieldsDouble.add(fieldDouble);
+		// this.fieldsDouble.add(fieldDouble);
 		this.fields.put(name, fieldDouble);
 	}
 
@@ -213,7 +232,7 @@ public class EntityEditor extends AView implements IItemView {
 				final JButton btnProperty = new JButton(property.getRelation().getName() + " " + property.getType().getName());
 				btnProperty.setName(name);
 				btnProperty.addActionListener(e -> {
-					this.editor.setView(new EntityEditor(this.editor, property, this.itemView));
+					this.editor.setView(new EntityEditor(this.editor, property, this.itemView, this));
 				});
 				final JLabel labelProperty = new JLabel(name);
 				labelProperty.setLabelFor(btnProperty);
@@ -230,7 +249,7 @@ public class EntityEditor extends AView implements IItemView {
 			final JButton btnThing = new JButton(thing.getName());
 			btnThing.setName(name);
 			btnThing.addActionListener(e -> {
-				this.editor.setView(new EntityEditor(this.editor, thing, this.itemView));
+				this.editor.setView(new EntityEditor(this.editor, thing, this.itemView, this));
 			});
 			final JLabel labelThing = new JLabel(name);
 			labelThing.setLabelFor(btnThing);
@@ -238,5 +257,10 @@ public class EntityEditor extends AView implements IItemView {
 			this.fieldsPanel.add(btnThing);
 			this.fields.put(name, btnThing);
 		}
+	}
+
+	private EntityEditor getNewInstance() {
+		// create new instance with current values
+		return new EntityEditor(this.editor, this.entity, this.itemView);
 	}
 }
