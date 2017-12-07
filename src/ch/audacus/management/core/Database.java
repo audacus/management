@@ -268,13 +268,13 @@ public class Database {
 	}
 
 	private static void executeSql(final String sql) {
-		//		System.out.println("execute: \n" + sql);
+//		System.out.println("execute: \n" + sql);
 		try {
 			Database.get().createStatement().executeUpdate(sql);
 			System.out.println("sql executed successfully");
 		} catch (final SQLException e) {
 			System.err.println("sql could not be executed");
-			//			e.printStackTrace();
+//			e.printStackTrace();
 		}
 	}
 }
